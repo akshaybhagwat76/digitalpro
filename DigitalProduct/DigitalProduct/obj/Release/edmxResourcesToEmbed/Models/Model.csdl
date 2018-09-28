@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="DigitalProductModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="user_role">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="RoleName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="userprofiles" Relationship="DigitalProductModel.FK__UserProfi__RoleI__0AD2A005" FromRole="user_role" ToRole="userprofile" />
+  </EntityType>
+  <EntityContainer Name="DigitalProductEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="user_role" EntityType="Self.user_role" />
+    <EntitySet Name="categories" EntityType="DigitalProductModel.category" />
+    <EntitySet Name="products" EntityType="DigitalProductModel.product" />
+    <AssociationSet Name="FK_ProductCategory" Association="DigitalProductModel.FK_ProductCategory">
+      <End Role="category" EntitySet="categories" />
+      <End Role="product" EntitySet="products" />
+    </AssociationSet>
+    <EntitySet Name="comments" EntityType="DigitalProductModel.comment" />
+    <AssociationSet Name="FK_comments_product" Association="DigitalProductModel.FK_comments_product">
+      <End Role="product" EntitySet="products" />
+      <End Role="comment" EntitySet="comments" />
+    </AssociationSet>
+    <FunctionImport Name="sp_getComments" ReturnType="Collection(DigitalProductModel.sp_getComments_Result)">
+      <Parameter Name="product_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_getComments1" EntitySet="comments" ReturnType="Collection(DigitalProductModel.comment)">
+      <Parameter Name="product_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <EntitySet Name="userprofiles" EntityType="DigitalProductModel.userprofile" />
+    <AssociationSet Name="FK_comments_userprofile" Association="DigitalProductModel.FK_comments_userprofile">
+      <End Role="userprofile" EntitySet="userprofiles" />
+      <End Role="comment" EntitySet="comments" />
+    </AssociationSet>
+    <AssociationSet Name="FK__UserProfi__RoleI__0AD2A005" Association="DigitalProductModel.FK__UserProfi__RoleI__0AD2A005">
+      <End Role="user_role" EntitySet="user_role" />
+      <End Role="userprofile" EntitySet="userprofiles" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="category">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="CategoryName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+    <Property Name="IsActive" Type="Boolean" Nullable="false" />
+    <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
+    <Property Name="Status" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="products" Relationship="DigitalProductModel.FK_ProductCategory" FromRole="category" ToRole="product" />
+  </EntityType>
+  <EntityType Name="product">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ProductName" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="false" />
+    <Property Name="Title" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+    <Property Name="Description" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+    <Property Name="Price" Type="Double" Nullable="false" />
+    <Property Name="IsActive" Type="Boolean" Nullable="false" />
+    <Property Name="IsDeleted" Type="Boolean" />
+    <Property Name="Status" Type="Boolean" Nullable="false" />
+    <Property Name="CategoryId" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="category" Relationship="DigitalProductModel.FK_ProductCategory" FromRole="product" ToRole="category" />
+    <NavigationProperty Name="comments" Relationship="DigitalProductModel.FK_comments_product" FromRole="product" ToRole="comment" />
+  </EntityType>
+  <Association Name="FK_ProductCategory">
+    <End Type="DigitalProductModel.category" Role="category" Multiplicity="1" />
+    <End Type="DigitalProductModel.product" Role="product" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="category">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="product">
+        <PropertyRef Name="CategoryId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="comment">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Comment_content" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="Created_date" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Update_date" Type="DateTime" Precision="3" />
+    <Property Name="Publish" Type="Boolean" Nullable="false" />
+    <Property Name="User_id" Type="Int32" />
+    <Property Name="Product_id" Type="Int32" />
+    <NavigationProperty Name="product" Relationship="DigitalProductModel.FK_comments_product" FromRole="comment" ToRole="product" />
+    <NavigationProperty Name="userprofile" Relationship="DigitalProductModel.FK_comments_userprofile" FromRole="comment" ToRole="userprofile" />
+  </EntityType>
+  <Association Name="FK_comments_product">
+    <End Type="DigitalProductModel.product" Role="product" Multiplicity="0..1" />
+    <End Type="DigitalProductModel.comment" Role="comment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="product">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="comment">
+        <PropertyRef Name="Product_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <ComplexType Name="sp_getComments_Result">
+    <Property Type="Int32" Name="Id" Nullable="false" />
+    <Property Type="String" Name="Comment_content" Nullable="false" />
+    <Property Type="DateTime" Name="Created_date" Nullable="false" Precision="23" />
+    <Property Type="DateTime" Name="Update_date" Nullable="true" Precision="23" />
+    <Property Type="Boolean" Name="Publish" Nullable="false" />
+    <Property Type="Int32" Name="User_id" Nullable="true" />
+    <Property Type="Int32" Name="Product_id" Nullable="true" />
+  </ComplexType>
+  <EntityType Name="userprofile">
+    <Key>
+      <PropertyRef Name="UserId" />
+    </Key>
+    <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="UserName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Password" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="FullName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+    <Property Name="Mobile" Type="String" MaxLength="12" FixedLength="false" Unicode="true" />
+    <Property Name="Address" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="City" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="PinCode" Type="String" MaxLength="6" FixedLength="false" Unicode="true" />
+    <Property Name="State" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="CreatedById" Type="Int32" />
+    <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="IsDeactive" Type="Boolean" Nullable="false" />
+    <Property Name="RoleId" Type="Int32" Nullable="false" />
+    <Property Name="Email" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="comments" Relationship="DigitalProductModel.FK_comments_userprofile" FromRole="userprofile" ToRole="comment" />
+    <NavigationProperty Name="user_role" Relationship="DigitalProductModel.FK__UserProfi__RoleI__0AD2A005" FromRole="userprofile" ToRole="user_role" />
+  </EntityType>
+  <Association Name="FK_comments_userprofile">
+    <End Type="DigitalProductModel.userprofile" Role="userprofile" Multiplicity="0..1" />
+    <End Type="DigitalProductModel.comment" Role="comment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="userprofile">
+        <PropertyRef Name="UserId" />
+      </Principal>
+      <Dependent Role="comment">
+        <PropertyRef Name="User_id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__UserProfi__RoleI__0AD2A005">
+    <End Type="DigitalProductModel.user_role" Role="user_role" Multiplicity="1" />
+    <End Type="DigitalProductModel.userprofile" Role="userprofile" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="user_role">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="userprofile">
+        <PropertyRef Name="RoleId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>
